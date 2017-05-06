@@ -214,8 +214,41 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # # TODO: finish this function!
+        def terminal_test(game, depth):
+            return depth == 0 or game.is_winner(self) or game.is_opponent_winner(self)
+
+        def min_value(game, depth):
+            if terminal_test(game, depth):
+                return self.score(game)
+
+            moves = game.get_legal_moves()
+            v = float('-inf')
+            for move in moves:
+                newgame = game.forecast_move(move)
+                score = self.max_value(newgame, depth - 1)
+                v = min(v,score)
+
+            return v
+
+        def max_value(game, depth):
+            if terminal_test(game, depth):
+                return self.score(game)
+
+            moves = game.get_legal_moves()
+            v = float('inf')
+            for move in moves:
+                newgame = game.forecast_move(move)
+                score = self.min_value(newgame, depth - 1)
+                v = max(v,score)
+
+            return v
+        # raise NotImplementedError
+        # player = game.active_player()
+        moves = game.get_legal_moves()
+
+        return argmax(moves,
+                      key=lambda move: self.min_value(game.forecast_move(move)), depth)
 
 
 class AlphaBetaPlayer(IsolationPlayer):
