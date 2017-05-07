@@ -247,7 +247,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         # # TODO: finish this function!
         def terminal_test(game, depth):
-            return depth == 0 or game.is_winner(self) or game.is_opponent_winner(self)
+            return depth == 0 or game.is_winner(self) or game.is_loser(self)
 
         def min_value(game, depth):
             if terminal_test(game, depth):
@@ -389,7 +389,7 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         # # TODO: finish this function!
         def terminal_test(game, depth):
-            return depth == 0 or game.is_winner(self) or game.is_opponent_winner(self)
+            return depth == 0 or game.is_winner(self) or game.is_loser(self)
 
         def min_value(game, alpha, beta, depth):
             if terminal_test(game, depth):
