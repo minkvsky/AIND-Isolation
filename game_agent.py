@@ -44,7 +44,7 @@ def custom_score(game, player):
 
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - opp_moves)
+    return float(own_moves - 2 * opp_moves + 8)
 
 
 
@@ -289,7 +289,7 @@ class MinimaxPlayer(IsolationPlayer):
             if v > best_score:
                 best_score = v
                 best_action = move
-        return best_score
+        return best_action
 
 
 class AlphaBetaPlayer(IsolationPlayer):
