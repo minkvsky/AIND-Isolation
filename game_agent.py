@@ -276,19 +276,22 @@ class MinimaxPlayer(IsolationPlayer):
             return v
         # raise NotImplementedError
         # player = game.active_player()
-        moves = game.get_legal_moves()
-
         # return argmax(moves,
         #               key=lambda move: min_value(game.forecast_move(move), depth))
+
         best_score = float('-inf')
         best_action = None
         moves = game.get_legal_moves()
+        if not moves:
+            return (-1, -1)
+
         for move in moves:
             newgame = game.forecast_move(move)
             v = min_value(newgame, depth)
-            if v > best_score:
+            if v >= best_score:
                 best_score = v
                 best_action = move
+        # print(best_action)
         return best_action
 
 
@@ -431,16 +434,20 @@ class AlphaBetaPlayer(IsolationPlayer):
                 alpha = max(alpha, v)
             return v
         # raise NotImplementedError
-        # Body of alphabeta_search starts here:
+        # Body of alphabeta_search starts here
+
         best_score = float('-inf')
         beta = float('inf')
         best_action = None
         moves = game.get_legal_moves()
+        if not moves:
+            return (-1, -1)
         for move in moves:
             newgame = game.forecast_move(move)
             v = min_value(newgame, best_score, beta , depth)
-            if v > best_score:
+            if v >= best_score:
                 best_score = v
                 best_action = move
 
+        # print(best_action)
         return best_action
