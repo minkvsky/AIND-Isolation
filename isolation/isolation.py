@@ -315,7 +315,7 @@ class Board(object):
         move_history = []
 
         time_millis = lambda: 1000 * timeit.default_timer()
-
+        print('game start')
         while True:
 
             legal_player_moves = self.get_legal_moves()
@@ -330,11 +330,16 @@ class Board(object):
                 curr_move = Board.NOT_MOVED
 
             if move_end < 0:
+                print('timeout')
                 return self._inactive_player, move_history, "timeout"
 
             if curr_move not in legal_player_moves:
                 if len(legal_player_moves) > 0:
+                    print('forfeit')
+                    print(legal_player_moves)
+                    print(curr_move)
                     return self._inactive_player, move_history, "forfeit"
+                print('illegal move')
                 return self._inactive_player, move_history, "illegal move"
 
             move_history.append(list(curr_move))

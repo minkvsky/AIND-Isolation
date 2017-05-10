@@ -195,12 +195,14 @@ class MinimaxPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
+            # print('get move:{}'.format(self.minimax(game, self.search_depth)))
             return self.minimax(game, self.search_depth)
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
 
         # Return the best move from the last completed search iteration
+        # print('get move:{}'.format(best_move)) # if you get this wrong in minimax
         return best_move
 
     def minimax(self, game, depth):
@@ -254,7 +256,11 @@ class MinimaxPlayer(IsolationPlayer):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            v = float('-inf')
+            if not moves:
+                print('min_value:{}'.format(moves))
+
+
+            v = float('inf')
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = max_value(newgame, depth - 1)
@@ -267,7 +273,12 @@ class MinimaxPlayer(IsolationPlayer):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            v = float('inf')
+            if not moves:
+                print('max_value:{}'.format(moves))
+
+            if not moves:
+                print('max_value:'.format(moves))
+            v = float('-inf')
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = min_value(newgame, depth - 1)
@@ -288,9 +299,11 @@ class MinimaxPlayer(IsolationPlayer):
         for move in moves:
             newgame = game.forecast_move(move)
             v = min_value(newgame, depth)
-            if v >= best_score:
+            if v > best_score:
                 best_score = v
                 best_action = move
+            # print(best_score)
+            # print(best_action)
         # print(best_action)
         return best_action
 
@@ -409,7 +422,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            v = float('-inf')
+            v = float('inf')
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = max_value(newgame, alpha, beta, depth - 1)
@@ -424,7 +437,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            v = float('inf')
+            v = float('-inf')
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = min_value(newgame, alpha, beta, depth - 1)
@@ -444,8 +457,8 @@ class AlphaBetaPlayer(IsolationPlayer):
             return (-1, -1)
         for move in moves:
             newgame = game.forecast_move(move)
-            v = min_value(newgame, best_score, beta , depth)
-            if v >= best_score:
+            v = min_value(newgame, best_score, beta, depth)
+            if v > best_score:
                 best_score = v
                 best_action = move
 
