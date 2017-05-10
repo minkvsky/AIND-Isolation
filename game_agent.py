@@ -249,6 +249,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         # # TODO: finish this function!
         def terminal_test(game, depth):
+            # some problem here
             return depth == 0 or game.is_winner(self) or game.is_loser(self)
 
         def min_value(game, depth):
@@ -264,6 +265,7 @@ class MinimaxPlayer(IsolationPlayer):
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = max_value(newgame, depth - 1)
+                # print('min_value:score:{}'.format(score))
                 v = min(v,score)
 
             return v
@@ -276,12 +278,11 @@ class MinimaxPlayer(IsolationPlayer):
             if not moves:
                 print('max_value:{}'.format(moves))
 
-            if not moves:
-                print('max_value:'.format(moves))
             v = float('-inf')
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = min_value(newgame, depth - 1)
+                # print('max_value:score:{}'.format(score))
                 v = max(v,score)
 
             return v
@@ -291,7 +292,7 @@ class MinimaxPlayer(IsolationPlayer):
         #               key=lambda move: min_value(game.forecast_move(move), depth))
 
         best_score = float('-inf')
-        best_action = None
+        best_action = (-1, -1)
         moves = game.get_legal_moves()
         if not moves:
             return (-1, -1)
@@ -299,12 +300,15 @@ class MinimaxPlayer(IsolationPlayer):
         for move in moves:
             newgame = game.forecast_move(move)
             v = min_value(newgame, depth)
-            if v > best_score:
+            if v >= best_score:
                 best_score = v
                 best_action = move
             # print(best_score)
             # print(best_action)
         # print(best_action)
+        if best_action == None:
+            print('best_action:None_best_Score:{}'.format(best_score))
+        # print('once_minimax')
         return best_action
 
 
@@ -451,14 +455,14 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         best_score = float('-inf')
         beta = float('inf')
-        best_action = None
+        best_action = (-1, -1)
         moves = game.get_legal_moves()
         if not moves:
             return (-1, -1)
         for move in moves:
             newgame = game.forecast_move(move)
             v = min_value(newgame, best_score, beta, depth)
-            if v > best_score:
+            if v >= best_score:
                 best_score = v
                 best_action = move
 
