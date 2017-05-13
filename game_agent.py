@@ -42,9 +42,13 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - 2 * opp_moves + 8)
+
+    own_moves = game.get_legal_moves(player)
+    opp_moves = game.get_legal_moves(game.get_opponent(player))
+
+    own_sum = float(sum([len(game._Board__get_moves(move)) for move in own_moves]))
+    opp_sum = float(sum([len(game._Board__get_moves(move)) for move in opp_moves]))
+    return own_sum - opp_sum
 
 
 
@@ -73,21 +77,24 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    # raise NotImplementedError
+
     if game.is_loser(player):
         return float("-inf")
 
     if game.is_winner(player):
         return float("inf")
 
-    # opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    # blank_moves = len(game.get_blank_spaces())
-    #
-    # return float(blank_moves - opp_moves)
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    blank_moves = len(game.get_blank_spaces())
+
+    return float(blank_moves - opp_moves)
+
     own_location = game.get_player_location(player)
     opp_location = game.get_player_location(game.get_opponent(player))
-    distance = abs(own_location[0]-opp_location[0]) + abs(own_location[1]-opp_location[1])
+    distance = abs(own_location[0] - opp_location[0]) + abs(own_location[1] - opp_location[1])
     return float(distance)
+
+
 
 
 def custom_score_3(game, player):
@@ -113,17 +120,7 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    # raise NotImplementedError
-    # if game.is_loser(player):
-    #     return float("-inf")
-    #
-    # if game.is_winner(player):
-    #     return float("inf")
-    #
-    # own_moves = len(game.get_legal_moves(player))
-    # blank_moves = len(game.get_blank_spaces())
-    #
-    # return float(own_moves) / float(blank_moves)
+
     if game.is_loser(player):
         return float("-inf")
 
@@ -133,22 +130,9 @@ def custom_score_3(game, player):
     def in_bounds(game, row, col):
         return 0 <= row < game.height and 0 <= col < game.width
 
-    bonus = 0.
-
-    center = (int(game.width/2), int(game.height/2))
-    r, c = center
-    directions = [(-1, -2), (-1, 2), (1, -2), (1, 2),
-                  (2, -1), (2, 1), (-2, -1), (-2, 1)]
-
-    off_center = [(r + dr, c + dc) for dr, dc in directions if in_bounds(game, r + dr, c + dc)]
-    player_location = game.get_player_location(player)
-    if player_location == center:
-        bonus = 1.5
-    elif player_location in off_center:
-            bonus = 0.5
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - opp_moves) + bonus
+    return float(own_moves - 1.5 * opp_moves)
 
 
 class IsolationPlayer:
@@ -277,7 +261,6 @@ class MinimaxPlayer(IsolationPlayer):
 
         # # TODO: finish this function!
         def terminal_test(game, depth):
-            # some problem here
             return depth == 0 or game.is_winner(self) or game.is_loser(self)
 
         def min_value(game, depth):
@@ -290,7 +273,6 @@ class MinimaxPlayer(IsolationPlayer):
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = max_value(newgame, depth - 1)
-                # print('min_value:score:{}'.format(score))
                 v = min(v,score)
 
             return v
@@ -305,22 +287,15 @@ class MinimaxPlayer(IsolationPlayer):
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = min_value(newgame, depth - 1)
-                # print('max_value:score:{}'.format(score))
                 v = max(v,score)
 
             return v
-        # raise NotImplementedError
-        # player = game.active_player()
-        # return argmax(moves,
-        #               key=lambda move: min_value(game.forecast_move(move), depth))
 
         best_score = float('-inf')
         best_action = (-1, -1)
         if terminal_test(game, depth):
             return best_action
         moves = game.get_legal_moves()
-        # if not moves:
-        #     return (-1, -1)
 
         for move in moves:
             newgame = game.forecast_move(move)
@@ -328,10 +303,7 @@ class MinimaxPlayer(IsolationPlayer):
             if v >= best_score:
                 best_score = v
                 best_action = move
-            # print(best_score)
-            # print(best_action)
-        # print(best_action)
-        # print('once_minimax')
+
         return best_action
 
 
@@ -455,7 +427,6 @@ class AlphaBetaPlayer(IsolationPlayer):
                 score = max_value(newgame, alpha, beta, depth - 1)
                 best_score = min(best_score, score)
                 if best_score < alpha:
-                    # return best_score
                     break
                 beta = min(beta, best_score)
             return best_score
@@ -471,7 +442,6 @@ class AlphaBetaPlayer(IsolationPlayer):
                 score = min_value(newgame, alpha, beta, depth - 1)
                 best_score = max(best_score, score)
                 if best_score > beta:
-                    # return best_score
                     break
                 alpha = max(alpha, best_score)
             return best_score
@@ -484,12 +454,11 @@ class AlphaBetaPlayer(IsolationPlayer):
         for move in moves:
             newgame = game.forecast_move(move)
             score = min_value(newgame, alpha, beta, depth)
-            # best_score = max(best_score, score)
+
             if best_score <= score:
                 best_score = score
                 best_action = move
             if best_score > beta:
-                # return best_score
                 break
             alpha = max(alpha, best_score)
 
