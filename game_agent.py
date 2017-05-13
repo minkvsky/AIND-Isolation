@@ -264,6 +264,9 @@ class MinimaxPlayer(IsolationPlayer):
             return depth == 0 or game.is_winner(self) or game.is_loser(self)
 
         def min_value(game, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
             if terminal_test(game, depth):
                 return self.score(game, self)
 
@@ -278,6 +281,9 @@ class MinimaxPlayer(IsolationPlayer):
             return v
 
         def max_value(game, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
             if terminal_test(game, depth):
                 return self.score(game, self)
 
@@ -417,6 +423,9 @@ class AlphaBetaPlayer(IsolationPlayer):
             return depth == 0 or game.is_winner(self) or game.is_loser(self)
 
         def min_value(game, alpha, beta, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
             if terminal_test(game, depth):
                 return self.score(game, self)
 
@@ -432,6 +441,9 @@ class AlphaBetaPlayer(IsolationPlayer):
             return best_score
 
         def max_value(game, alpha, beta, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
             if terminal_test(game, depth):
                 return self.score(game, self)
 
