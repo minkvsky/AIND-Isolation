@@ -80,17 +80,21 @@ def custom_score_2(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    blank_moves = len(game.get_blank_spaces())
-
-    return float(blank_moves - opp_moves)
+    # opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    # blank_moves = len(game.get_blank_spaces())
+    #
+    # return float(blank_moves - opp_moves)
+    own_location = game.get_player_location(player)
+    opp_location = game.get_player_location(game.get_opponent(player))
+    distance = abs(own_location[0]-opp_location[0]) + abs(own_location[1]-opp_location[1])
+    return float(distance)
 
 
 def custom_score_3(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
 
-    Note: this function should be called from within a Player instance as
+    Note: this function should be called    from within a Player instance as
     `self.score()` -- you should not need to call this function directly.
 
     Parameters
@@ -110,17 +114,41 @@ def custom_score_3(game, player):
     """
     # TODO: finish this function!
     # raise NotImplementedError
+    # if game.is_loser(player):
+    #     return float("-inf")
+    #
+    # if game.is_winner(player):
+    #     return float("inf")
+    #
+    # own_moves = len(game.get_legal_moves(player))
+    # blank_moves = len(game.get_blank_spaces())
+    #
+    # return float(own_moves) / float(blank_moves)
     if game.is_loser(player):
         return float("-inf")
 
     if game.is_winner(player):
         return float("inf")
 
+    def in_bounds(game, row, col):
+        return 0 <= row < game.height and 0 <= col < game.width
+
+    bonus = 0.
+
+    center = (int(game.width/2), int(game.height/2))
+    r, c = center
+    directions = [(-1, -2), (-1, 2), (1, -2), (1, 2),
+                  (2, -1), (2, 1), (-2, -1), (-2, 1)]
+
+    off_center = [(r + dr, c + dc) for dr, dc in directions if in_bounds(game, r + dr, c + dc)]
+    player_location = game.get_player_location(player)
+    if player_location == center:
+        bonus = 1.5
+    elif player_location in off_center:
+            bonus = 0.5
     own_moves = len(game.get_legal_moves(player))
-    blank_moves = len(game.get_blank_spaces())
-
-    return float(own_moves) / float(blank_moves)
-
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - opp_moves) + bonus
 
 
 class IsolationPlayer:
@@ -257,9 +285,6 @@ class MinimaxPlayer(IsolationPlayer):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            if not moves:
-                print('min_value:{}'.format(moves))
-
 
             v = float('inf')
             for move in moves:
@@ -275,8 +300,6 @@ class MinimaxPlayer(IsolationPlayer):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            if not moves:
-                print('max_value:{}'.format(moves))
 
             v = float('-inf')
             for move in moves:
@@ -293,9 +316,11 @@ class MinimaxPlayer(IsolationPlayer):
 
         best_score = float('-inf')
         best_action = (-1, -1)
+        if terminal_test(game, depth):
+            return best_action
         moves = game.get_legal_moves()
-        if not moves:
-            return (-1, -1)
+        # if not moves:
+        #     return (-1, -1)
 
         for move in moves:
             newgame = game.forecast_move(move)
@@ -306,8 +331,6 @@ class MinimaxPlayer(IsolationPlayer):
             # print(best_score)
             # print(best_action)
         # print(best_action)
-        if best_action == None:
-            print('best_action:None_best_Score:{}'.format(best_score))
         # print('once_minimax')
         return best_action
 
@@ -426,45 +449,48 @@ class AlphaBetaPlayer(IsolationPlayer):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            v = float('inf')
+            best_score = float('inf')
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = max_value(newgame, alpha, beta, depth - 1)
-                v = min(v,score)
-                if v <= alpha:
-                    return v
-                beta = min(beta, v)
-            return v
+                best_score = min(best_score, score)
+                if best_score < alpha:
+                    # return best_score
+                    break
+                beta = min(beta, best_score)
+            return best_score
 
         def max_value(game, alpha, beta, depth):
             if terminal_test(game, depth):
                 return self.score(game, self)
 
             moves = game.get_legal_moves()
-            v = float('-inf')
+            best_score = float('-inf')
             for move in moves:
                 newgame = game.forecast_move(move)
                 score = min_value(newgame, alpha, beta, depth - 1)
-                v = max(v,score)
-                if v >= beta:
-                    return v
-                alpha = max(alpha, v)
-            return v
-        # raise NotImplementedError
-        # Body of alphabeta_search starts here
+                best_score = max(best_score, score)
+                if best_score > beta:
+                    # return best_score
+                    break
+                alpha = max(alpha, best_score)
+            return best_score
 
-        best_score = float('-inf')
-        beta = float('inf')
         best_action = (-1, -1)
+        if terminal_test(game, depth):
+            return best_action
         moves = game.get_legal_moves()
-        if not moves:
-            return (-1, -1)
+        best_score = float('-inf')
         for move in moves:
             newgame = game.forecast_move(move)
-            v = min_value(newgame, best_score, beta, depth)
-            if v >= best_score:
-                best_score = v
+            score = min_value(newgame, alpha, beta, depth)
+            # best_score = max(best_score, score)
+            if best_score <= score:
+                best_score = score
                 best_action = move
+            if best_score > beta:
+                # return best_score
+                break
+            alpha = max(alpha, best_score)
 
-        # print(best_action)
         return best_action
