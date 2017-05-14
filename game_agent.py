@@ -301,7 +301,7 @@ class MinimaxPlayer(IsolationPlayer):
         best_action = (-1, -1)
         if terminal_test(game, depth):
             return best_action
-        moves = game.get_legal_moves()
+        moves = game.get_legal_moves(self)
 
         for move in moves:
             newgame = game.forecast_move(move)
@@ -361,7 +361,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            return self.alphabeta(game, self.search_depth)
+            for depth in range(1,game.width * game.height):
+                best_move = self.alphabeta(game, depth)
+            return best_move
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
