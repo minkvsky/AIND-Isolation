@@ -305,7 +305,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         for move in moves:
             newgame = game.forecast_move(move)
-            v = min_value(newgame, depth)
+            v = min_value(newgame, depth - 1)
             if v >= best_score:
                 best_score = v
                 best_action = move
@@ -437,9 +437,10 @@ class AlphaBetaPlayer(IsolationPlayer):
                 newgame = game.forecast_move(move)
                 score = max_value(newgame, alpha, beta, depth - 1)
                 best_score = min(best_score, score)
-                if best_score < alpha:
-                    break
                 beta = min(beta, best_score)
+                if beta <= alpha:
+                    break
+
             return best_score
 
         def max_value(game, alpha, beta, depth):
@@ -455,9 +456,11 @@ class AlphaBetaPlayer(IsolationPlayer):
                 newgame = game.forecast_move(move)
                 score = min_value(newgame, alpha, beta, depth - 1)
                 best_score = max(best_score, score)
-                if best_score > beta:
-                    break
                 alpha = max(alpha, best_score)
+                if alpha >= beta:
+                    # return best_score
+                    break
+
             return best_score
 
         best_action = (-1, -1)
@@ -467,13 +470,13 @@ class AlphaBetaPlayer(IsolationPlayer):
         best_score = float('-inf')
         for move in moves:
             newgame = game.forecast_move(move)
-            score = min_value(newgame, alpha, beta, depth)
-
+            score = min_value(newgame, alpha, beta, depth - 1)
             if best_score <= score:
                 best_score = score
                 best_action = move
-            if best_score > beta:
-                break
             alpha = max(alpha, best_score)
+            if alpha >= beta:
+                return best_action
+
 
         return best_action
