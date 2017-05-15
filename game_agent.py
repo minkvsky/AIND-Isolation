@@ -84,11 +84,6 @@ def custom_score_2(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    blank_moves = len(game.get_blank_spaces())
-
-    return float(blank_moves - opp_moves)
-
     own_location = game.get_player_location(player)
     opp_location = game.get_player_location(game.get_opponent(player))
     distance = abs(own_location[0] - opp_location[0]) + abs(own_location[1] - opp_location[1])
@@ -458,7 +453,6 @@ class AlphaBetaPlayer(IsolationPlayer):
                 best_score = max(best_score, score)
                 alpha = max(alpha, best_score)
                 if alpha >= beta:
-                    # return best_score
                     break
 
             return best_score

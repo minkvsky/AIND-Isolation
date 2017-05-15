@@ -38,3 +38,7 @@ Here is the result of 400 matches.AB_Custom gets the best winning probability.
 
 # Conclution
 My best score is the difference of the sum of available moves for each legal move of the two players which can outplay improved_score.
+I recommend custom_score(the difference of the sum of available moves for each legal move of the two players) as my final heuristic base on the three following reason:
+- this score performs better and outplays improved_score.
+- only addition and subtraction appear in this score,so this heuristic is easy.
+- althougth this score is more complex than others,it will not go shallower than others because it is not slower to calculate.
